@@ -150,6 +150,8 @@ def add_kernel(
     name,
     kernel_cmd,
     cpus=1,
+    gpus=None,
+    partition=None,
     pe=None,
     language=None,
     system=False,
@@ -226,6 +228,16 @@ def add_kernel(
         argv.extend(["--cpus", "{0}".format(cpus)])
         kernel_name.append("{0}".format(cpus))
         display_name.append("{0} CPUs".format(cpus))
+
+    if gpus:
+        argv.extend(["--gpus", "{0}".format(gpus)])
+        kernel_name.append("{0}".format(gpus))
+        display_name.append("{0} GPUs".format(gpus))
+
+    if partition:
+        argv.extend(["--partition", "{0}".format(partition)])
+        kernel_name.append("{0}".format(partition))
+        display_name.append("Partition {0}".format(partition))
 
     if workdir is not None:
         argv.extend(["--workdir", workdir])
@@ -354,6 +366,18 @@ def manage():
         help="Launch the kernel as a multi-core job with this many cores if > 1.",
     )
     parser.add_argument(
+        "--gpus",
+        "-G",
+        type=int,
+        help="Launch the kernel with n GPUs enabled (SLURM only)",
+    )
+    parser.add_argument(
+        "--partition",
+        "-p",
+        type=str,
+        help="Select launched partition (SLURM only)",
+    )
+    parser.add_argument(
         "--pe", help="Parallel environment to use on when running on gridengine."
     )
     parser.add_argument(
@@ -437,6 +461,8 @@ def manage():
             args.name,
             args.kernel_cmd,
             args.cpus,
+            args.gpus,
+            args.partition,
             args.pe,
             args.language,
             args.system,

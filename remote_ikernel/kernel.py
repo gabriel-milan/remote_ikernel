@@ -204,6 +204,8 @@ class RemoteIKernel(object):
         connection_info=None,
         interface="sge",
         cpus=1,
+        gpus=None,
+        partition=None,
         pe="smp",
         kernel_cmd="ipython kernel",
         workdir=None,
@@ -232,6 +234,8 @@ class RemoteIKernel(object):
                 raise
         self.interface = interface
         self.cpus = cpus
+        self.gpus = gpus
+        self.partition = partition
         self.pe = pe
         self.kernel_cmd = kernel_cmd
         self.host = ''
@@ -422,6 +426,10 @@ class RemoteIKernel(object):
             tasks = "--cpus-per-task {cpus}".format(cpus=self.cpus)
         else:
             tasks = ""
+        if self.gpus:
+            tasks += " -G {}".format(self.gpus)
+        if self.partition:
+            tasks += " -p {}".format(self.partition)
         if self.launch_args:
             launch_args = self.launch_args
         else:
@@ -704,6 +712,8 @@ def start_remote_kernel():
     parser.add_argument("connection_info")
     parser.add_argument("--interface", default="local")
     parser.add_argument("--cpus", type=int, default=1)
+    parser.add_argument("--gpus", type=int, default=None)
+    parser.add_argument("--partition", type=str, default=None)
     parser.add_argument("--pe", default="smp")
     parser.add_argument(
         "--kernel_cmd", default="ipython kernel -f {host_connection_file}"
@@ -729,6 +739,8 @@ def start_remote_kernel():
         connection_info=args.connection_info,
         interface=args.interface,
         cpus=args.cpus,
+        gpus=args.gpus,
+        partition=args.partition,
         pe=args.pe,
         kernel_cmd=args.kernel_cmd,
         workdir=args.workdir,
